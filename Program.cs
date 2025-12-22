@@ -1,5 +1,7 @@
-using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+using UrlShortner;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
@@ -10,7 +12,8 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-
+var connectionString = builder.Configuration.GetConnectionString("UrlShortnerDatabase");
+builder.Services.AddEntityFrameworkNpgsql().AddDbContext<UrlShortnerContext>(opt => opt.UseNpgsql(connectionString));
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
