@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using UrlShortner;
@@ -11,9 +12,11 @@ using UrlShortner;
 namespace UrlShortner.Migrations
 {
     [DbContext(typeof(UrlShortnerContext))]
-    partial class UrlShortnerContextModelSnapshot : ModelSnapshot
+    [Migration("20251222034319_DeleteCancelledAt")]
+    partial class DeleteCancelledAt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

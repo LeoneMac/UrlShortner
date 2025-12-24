@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using UrlShortner;
+using UrlShortner.Services;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
@@ -12,6 +13,10 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddMvc();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddControllers();
+
 var connectionString = builder.Configuration.GetConnectionString("UrlShortnerDatabase");
 builder.Services.AddEntityFrameworkNpgsql().AddDbContext<UrlShortnerContext>(opt => opt.UseNpgsql(connectionString));
 var app = builder.Build();
@@ -20,6 +25,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.MapControllers();
 
 Todo[] sampleTodos =
 [
@@ -40,7 +47,10 @@ todosApi.MapGet("/{id}", Results<Ok<Todo>, NotFound> (int id) =>
         : TypedResults.NotFound())
     .WithName("GetTodoById");
 
+
 app.Run();
+
+
 
 public record Todo(int Id, string? Title, DateOnly? DueBy = null, bool IsComplete = false);
 

@@ -9,3 +9,11 @@ GET {{UrlShortner_HostAddress}}/todos/1
 Accept: application/json
 
 ###
+POST {{UrlShortner_HostAddress}}/user/
+Content-Type: "application/json"
+
+{
+  "name": "Pedro",
+  "email": "pedro@gmail.com",
+  "password": "password123"
+}

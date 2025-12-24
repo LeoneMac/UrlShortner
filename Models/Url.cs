@@ -17,6 +17,5 @@ namespace UrlShortner.Models
         public User User { get; set; } = null!;
         public DateTime? ExpirationDate { get; set; } = DateTime.Now.AddHours(24);
         public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public DateTime? CancelledAt { get; set; } 
     }
 }
