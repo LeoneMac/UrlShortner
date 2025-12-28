@@ -1,28 +1,39 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using UrlShortner.Application.Dtos.User;
 using UrlShortner.Interfaces;
 using UrlShortner.Models;
+using UrlShortner.Validators;
 
 namespace UrlShortner.Services
 {
     public class UserService(UrlShortnerContext context, IMapper mapper) : IUserService
     {
-        public async Task<User> CreateAsync(CreateUserRequest request)
+        public async Task<(User? user, List<FluentValidation.Results.ValidationFailure>? errors)> CreateAsync(CreateUserRequest request)
         {
-            // TODO Pedro: Add validation and error handling AND THE PASSWORD HASHING I TOLD YOU
+            var validate = new CreateUserRequestValidator();
+            var validateResult = validate.Validate(request);
+
+            if (!validateResult.IsValid)
+                return (null, validateResult.Errors.ToList());
+
+            var passwordHasher = new PasswordHasher<User>();
             var user = new User
             {
                 Username = request.Name,
                 Email = request.Email,
-                PasswordHash = request.Password
             };
+
+            var hashedPassword = passwordHasher.HashPassword(user, request.Password);
+            user.PasswordHash = hashedPassword;
 
             await context.Users.AddAsync(user);
             await context.SaveChangesAsync();
 
-            return user;
+            return (user, null);
         }
 
         public async Task<UserResponseDto?> GetByIdAsync(Guid id)

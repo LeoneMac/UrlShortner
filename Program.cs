@@ -12,6 +12,7 @@ builder.Services.AddMvc();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUrlService, UrlService>();
 builder.Services.AddAutoMapper(typeof(UserProfile).Assembly);
+
 builder.Services.AddControllers();
 
 var connectionString = builder.Configuration.GetConnectionString("UrlShortnerDatabase");

@@ -25,7 +25,9 @@ public class UserController(IUserService userService) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateUserRequest request)
     {
-        var user = await userService.CreateAsync(request);
-        return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+        var creationResult = await userService.CreateAsync(request);
+        if (creationResult.errors != null)
+            return BadRequest(creationResult);
+        return CreatedAtAction(nameof(Create), new { id = creationResult.user!.Id }, creationResult.user);
     }
 }
