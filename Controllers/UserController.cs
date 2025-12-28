@@ -1,23 +1,31 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using UrlShortner.DTOs;
-using UrlShortner.Services;
+using UrlShortner.Application.Dtos.User;
+using UrlShortner.Interfaces;
 
 namespace UrlShortner.Controllers;
 
-[Route("user")]
 [ApiController]
-public class UserController : ControllerBase
+[Route("users")]
+public class UserController(IUserService userService) : ControllerBase
 {
-    private readonly IUserService _service;
-    public UserController(IUserService service)
+    public async Task<IActionResult> GetUsers(int take = 10, int startIndex = 0)
     {
-        _service = service;
+        return Ok(await userService.GetUsers(take, startIndex));
     }
-
-    [HttpPost]
-    public async Task<IActionResult> Create(CreateUserRequest request)
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id)
     {
-        var user = await _service.CreateAsync(request);
-        return Created("user", user);
+        var user = await userService.GetByIdAsync(id);
+        if (user == null)
+        {
+            return NotFound();
+        }
+        return Ok(user);
+    }
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] CreateUserRequest request)
+    {
+        var user = await userService.CreateAsync(request);
+        return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
     }
 }
