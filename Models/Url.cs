@@ -15,7 +15,7 @@ namespace UrlShortner.Models
         [ForeignKey(nameof(User))]
         public Guid UserId { get; set; }
         public User User { get; set; } = null!;
-        public DateTime? ExpirationDate { get; set; } = DateTime.Now.AddHours(24);
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? ExpirationDate { get; set; } = DateTime.UtcNow.AddHours(24);
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

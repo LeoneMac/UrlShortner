@@ -10,6 +10,7 @@ var builder = WebApplication.CreateSlimBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddMvc();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUrlService, UrlService>();
 builder.Services.AddAutoMapper(typeof(UserProfile).Assembly);
 builder.Services.AddControllers();
 
