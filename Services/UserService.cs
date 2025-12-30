@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using UrlShortner.Application.Dtos.User;
@@ -14,26 +15,33 @@ namespace UrlShortner.Services
     {
         public async Task<(User? user, List<FluentValidation.Results.ValidationFailure>? errors)> CreateAsync(CreateUserRequest request)
         {
-            var validate = new CreateUserRequestValidator();
-            var validateResult = validate.Validate(request);
+            CreateUserRequestValidator validate = new();
+            ValidationResult validateResult = validate.Validate(request);
+            List<ValidationFailure> validateResultErrors = [.. validateResult.Errors];
 
             if (!validateResult.IsValid)
-                return (null, validateResult.Errors.ToList());
+                return (user: null, errors: validateResultErrors);
 
-            var passwordHasher = new PasswordHasher<User>();
-            var user = new User
+            if (context.Users.Any(user => user.Email == request.Email))
+            {
+                validateResultErrors.Add(new ValidationFailure() { ErrorMessage = "Provided mail adress already in use." });
+                return (user: null, errors: validateResultErrors);
+            }
+
+            User user = new()
             {
                 Username = request.Name,
                 Email = request.Email,
             };
 
+            var passwordHasher = new PasswordHasher<User>();
             var hashedPassword = passwordHasher.HashPassword(user, request.Password);
             user.PasswordHash = hashedPassword;
 
             await context.Users.AddAsync(user);
             await context.SaveChangesAsync();
 
-            return (user, null);
+            return (user, errors: null);
         }
 
         public async Task<UserResponseDto?> GetByIdAsync(Guid id)
